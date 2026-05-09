@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Championship Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#f5f5f5;color:#1a1a1a;min-height:100vh}
+h1,h2,h3{font-family:'Outfit',sans-serif}
+.nav{background:#fff;padding:12px 3%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e0e0e0;position:sticky;top:0;z-index:999}
+.nav .logo{font-size:1.4rem;font-weight:800;color:#1a237e;cursor:pointer;display:flex;align-items:center;gap:8px}
+.wrap{max-width:1700px;margin:0 auto;padding:25px 15px}
+.btn{padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-p{background:#1a237e;color:#fff}.btn-p:hover{opacity:.9}
+.btn-o{background:#fff;border:1px solid #ddd;color:#333}.btn-o:hover{background:#f5f5f5}
+.btn-r{background:#d32f2f;color:#fff}
+
+/* HOME GRID */
+.tg{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;margin-top:40px}
+.tc{background:#fff;border-radius:20px;padding:35px 25px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.06);cursor:pointer;transition:all .3s;border:2px solid transparent}
+.tc:hover{transform:translateY(-8px);border-color:#1a237e}
+.tc .ti{height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.tc .ti img{max-height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))}
+.tc h3{font-size:1.4rem;color:#1a237e;margin-bottom:6px}
+.tc p{color:#888;font-size:.85rem;margin-bottom:18px}
+
+/* SELECT */
+.sp{background:#fff;border-radius:20px;padding:35px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;max-height:55vh;overflow-y:auto;margin-top:20px;padding:5px}
+.si{padding:10px 14px;border-radius:12px;border:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.si:hover{background:#f0f0f0}.si.on{background:#1a237e;color:#fff;border-color:#1a237e}
+.fl{width:24px;height:17px;object-fit:cover;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+/* BRACKET BACKGROUNDS */
+.bk-bg{min-height:100vh;background-size:cover;background-position:center;background-attachment:fixed;padding:20px 0}
+.bk-bg-overlay{background:rgba(255,255,255,0.82);padding:20px;border-radius:16px}
+
+/* BRACKET */
+.bk-wrap{display:flex;align-items:center;justify-content:center;gap:12px;padding:30px 0;zoom:.82}
+.bk-side{display:flex;align-items:center;gap:25px}
+.bk-side.rev{flex-direction:row-reverse}
+.rd{display:flex;flex-direction:column;gap:28px;justify-content:center}
+.rd-lb{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#444;text-align:center;margin-bottom:12px}
+.mc{background:rgba(255,255,255,0.95);border-radius:10px;width:175px;box-shadow:0 3px 8px rgba(0,0,0,.12);border:1px solid #ddd;overflow:hidden}
+.tr{padding:9px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;height:44px;border-bottom:1px solid #eee;transition:all .15s}
+.tr:last-child{border-bottom:none}
+.tr:hover{background:#f0f0f0}
+.tr.w{background:#e8f0fe;color:#1a73e8;font-weight:700;border-left:3px solid #1a73e8}
+.tn{font-size:.78rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl{width:28px;height:28px;object-fit:contain;border-radius:4px}
+
+/* PODIUM */
+.pod{display:flex;flex-direction:column;align-items:center;gap:30px;width:350px;padding:0 15px}
+.pod-trophy{width:280px;height:380px;display:flex;align-items:center;justify-content:center}
+.pod-trophy img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 15px 35px rgba(0,0,0,.25));animation:fl 3.5s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.fin{width:100%;background:#fff;border:2px solid #1a237e;border-radius:14px;padding:18px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+.champ{font-size:2.2rem;font-weight:900;color:#1a237e;text-align:center;margin-top:10px}
+
+/* MODAL */
+.mo{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
+.moc{background:#fff;width:95%;max-width:1000px;padding:35px;border-radius:24px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+.moc textarea{width:100%;border:1px solid #ddd;border-radius:10px;padding:12px;font-size:.85rem;resize:vertical}
+.mtbl{width:100%;border-collapse:collapse;margin-top:15px}
+.mtbl th{text-align:left;padding:10px;border-bottom:2px solid #e0e0e0;font-size:.7rem;text-transform:uppercase;color:#999}
+.mtbl td{padding:8px 10px;border-bottom:1px solid #eee;font-size:.8rem}
+.mtbl input{border:1px solid #ddd;padding:6px 10px;border-radius:6px;width:100%;font-size:.8rem}
+.mtbl select{border:1px solid #ddd;padding:6px;border-radius:6px;font-size:.8rem}
+
+.anim{animation:fadeUp .4s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1200px){.tg{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect}=React;
+
+const CUPS=[
+  {id:'WC',name:'Copa del Mundo 2026',img:'copa_mundial.png',size:16,type:'Nacional',
+   bg:'bg_mundial.png',color:'#b71c1c'},
+  {id:'CL',name:'Copa Libertadores',img:'copa_libertadores.png',size:16,type:'Club',
+   bg:'bg_libertadores.png',color:'#7b4f00'},
+  {id:'EC',name:'Eurocopa',img:'copa_eurocopa.png',size:16,type:'EuroNacional',
+   bg:'bg_eurocopa.png',color:'#0d47a1'},
+  {id:'CA',name:'Copa América',img:'copa_america.png',size:8,type:'AmNacional',
+   bg:'bg_copa_america.png',color:'#e65100'},
+  {id:'UCL',name:'Champions League',img:'copa_champions.png',size:16,type:'EuroClub',
+   bg:'bg_champions.png',color:'#1a237e'}
+];
+
+const W='https://upload.wikimedia.org/wikipedia/';
+const WE=W+'en/thumb/';
+const WC=W+'commons/thumb/';
+
+const SEED=[
+  // MUNDIAL - Selecciones
+  {id:1,name:'Argentina',logo:'https://flagcdn.com/w80/ar.png',cat:'Nacional'},
+  {id:2,name:'Brasil',logo:'https://flagcdn.com/w80/br.png',cat:'Nacional'},
+  {id:3,name:'Francia',logo:'https://flagcdn.com/w80/fr.png',cat:'Nacional'},
+  {id:4,name:'España',logo:'https://flagcdn.com/w80/es.png',cat:'Nacional'},
+  {id:5,name:'Alemania',logo:'https://flagcdn.com/w80/de.png',cat:'Nacional'},
+  {id:6,name:'Italia',logo:'https://flagcdn.com/w80/it.png',cat:'Nacional'},
+  {id:7,name:'Portugal',logo:'https://flagcdn.com/w80/pt.png',cat:'Nacional'},
+  {id:8,name:'Inglaterra',logo:'https://flagcdn.com/w80/gb-eng.png',cat:'Nacional'},
+  {id:9,name:'Países Bajos',logo:'https://flagcdn.com/w80/nl.png',cat:'Nacional'},
+  {id:10,name:'Uruguay',logo:'https://flagcdn.com/w80/uy.png',cat:'Nacional'},
+  {id:11,name:'Croacia',logo:'https://flagcdn.com/w80/hr.png',cat:'Nacional'},
+  {id:12,name:'Bélgica',logo:'https://flagcdn.com/w80/be.png',cat:'Nacional'},
+  {id:13,name:'Japón',logo:'https://flagcdn.com/w80/jp.png',cat:'Nacional'},
+  {id:14,name:'Corea del Sur',logo:'https://flagcdn.com/w80/kr.png',cat:'Nacional'},
+  {id:15,name:'Marruecos',logo:'https://flagcdn.com/w80/ma.png',cat:'Nacional'},
+  {id:16,name:'México',logo:'https://flagcdn.com/w80/mx.png',cat:'Nacional'},
+  {id:17,name:'EE.UU.',logo:'https://flagcdn.com/w80/us.png',cat:'Nacional'},
+  {id:18,name:'Canadá',logo:'https://flagcdn.com/w80/ca.png',cat:'Nacional'},
+  {id:19,name:'Chile',logo:'https://flagcdn.com/w80/cl.png',cat:'Nacional'},
+  {id:20,name:'Colombia',logo:'https://flagcdn.com/w80/co.png',cat:'Nacional'},
+  {id:21,name:'Ecuador',logo:'https://flagcdn.com/w80/ec.png',cat:'Nacional'},
+  {id:22,name:'Perú',logo:'https://flagcdn.com/w80/pe.png',cat:'Nacional'},
+  {id:23,name:'Suiza',logo:'https://flagcdn.com/w80/ch.png',cat:'Nacional'},
+  {id:24,name:'Senegal',logo:'https://flagcdn.com/w80/sn.png',cat:'Nacional'},
+  {id:25,name:'Ghana',logo:'https://flagcdn.com/w80/gh.png',cat:'Nacional'},
+  {id:26,name:'Camerún',logo:'https://flagcdn.com/w80/cm.png',cat:'Nacional'},
+  {id:27,name:'Serbia',logo:'https://flagcdn.com/w80/rs.png',cat:'Nacional'},
+  {id:28,name:'Dinamarca',logo:'https://flagcdn.com/w80/dk.png',cat:'Nacional'},
+  {id:29,name:'Australia',logo:'https://flagcdn.com/w80/au.png',cat:'Nacional'},
+  {id:30,name:'Arabia Saudita',logo:'https://flagcdn.com/w80/sa.png',cat:'Nacional'},
+  {id:31,name:'Irán',logo:'https://flagcdn.com/w80/ir.png',cat:'Nacional'},
+  {id:32,name:'Costa Rica',logo:'https://flagcdn.com/w80/cr.png',cat:'Nacional'},
+  // EUROCOPA - Selecciones
+  {id:201,name:'Francia',logo:'https://flagcdn.com/w80/fr.png',cat:'EuroNacional'},
+  {id:202,name:'Alemania',logo:'https://flagcdn.com/w80/de.png',cat:'EuroNacional'},
+  {id:203,name:'España',logo:'https://flagcdn.com/w80/es.png',cat:'EuroNacional'},
+  {id:204,name:'Italia',logo:'https://flagcdn.com/w80/it.png',cat:'EuroNacional'},
+  {id:205,name:'Inglaterra',logo:'https://flagcdn.com/w80/gb-eng.png',cat:'EuroNacional'},
+  {id:206,name:'Portugal',logo:'https://flagcdn.com/w80/pt.png',cat:'EuroNacional'},
+  {id:207,name:'Bélgica',logo:'https://flagcdn.com/w80/be.png',cat:'EuroNacional'},
+  {id:208,name:'Países Bajos',logo:'https://flagcdn.com/w80/nl.png',cat:'EuroNacional'},
+  {id:209,name:'Croacia',logo:'https://flagcdn.com/w80/hr.png',cat:'EuroNacional'},
+  {id:210,name:'Suiza',logo:'https://flagcdn.com/w80/ch.png',cat:'EuroNacional'},
+  {id:211,name:'Dinamarca',logo:'https://flagcdn.com/w80/dk.png',cat:'EuroNacional'},
+  {id:212,name:'Austria',logo:'https://flagcdn.com/w80/at.png',cat:'EuroNacional'},
+  {id:213,name:'Turquía',logo:'https://flagcdn.com/w80/tr.png',cat:'EuroNacional'},
+  {id:214,name:'Rep. Checa',logo:'https://flagcdn.com/w80/cz.png',cat:'EuroNacional'},
+  {id:215,name:'Escocia',logo:'https://flagcdn.com/w80/gb-sct.png',cat:'EuroNacional'},
+  {id:216,name:'Suecia',logo:'https://flagcdn.com/w80/se.png',cat:'EuroNacional'},
+  {id:217,name:'Hungría',logo:'https://flagcdn.com/w80/hu.png',cat:'EuroNacional'},
+  {id:218,name:'Rumanía',logo:'https://flagcdn.com/w80/ro.png',cat:'EuroNacional'},
+  {id:219,name:'Polonia',logo:'https://flagcdn.com/w80/pl.png',cat:'EuroNacional'},
+  {id:220,name:'Ucrania',logo:'https://flagcdn.com/w80/ua.png',cat:'EuroNacional'},
+  // COPA AMERICA - Selecciones
+  {id:301,name:'Argentina',logo:'https://flagcdn.com/w80/ar.png',cat:'AmNacional'},
+  {id:302,name:'Brasil',logo:'https://flagcdn.com/w80/br.png',cat:'AmNacional'},
+  {id:303,name:'Uruguay',logo:'https://flagcdn.com/w80/uy.png',cat:'AmNacional'},
+  {id:304,name:'Colombia',logo:'https://flagcdn.com/w80/co.png',cat:'AmNacional'},
+  {id:305,name:'Chile',logo:'https://flagcdn.com/w80/cl.png',cat:'AmNacional'},
+  {id:306,name:'México',logo:'https://flagcdn.com/w80/mx.png',cat:'AmNacional'},
+  {id:307,name:'EE.UU.',logo:'https://flagcdn.com/w80/us.png',cat:'AmNacional'},
+  {id:308,name:'Canadá',logo:'https://flagcdn.com/w80/ca.png',cat:'AmNacional'},
+  {id:309,name:'Ecuador',logo:'https://flagcdn.com/w80/ec.png',cat:'AmNacional'},
+  {id:310,name:'Perú',logo:'https://flagcdn.com/w80/pe.png',cat:'AmNacional'},
+  {id:311,name:'Paraguay',logo:'https://flagcdn.com/w80/py.png',cat:'AmNacional'},
+  {id:312,name:'Venezuela',logo:'https://flagcdn.com/w80/ve.png',cat:'AmNacional'},
+  {id:313,name:'Bolivia',logo:'https://flagcdn.com/w80/bo.png',cat:'AmNacional'},
+  {id:314,name:'Panamá',logo:'https://flagcdn.com/w80/pa.png',cat:'AmNacional'},
+  {id:315,name:'Jamaica',logo:'https://flagcdn.com/w80/jm.png',cat:'AmNacional'},
+  {id:316,name:'Costa Rica',logo:'https://flagcdn.com/w80/cr.png',cat:'AmNacional'},
+  // LIBERTADORES - URLs verificadas via Wikipedia API
+  {id:401,name:'River Plate',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Escudo_del_C_A_River_Plate.svg/120px-Escudo_del_C_A_River_Plate.svg.png',cat:'Club'},
+  {id:402,name:'Boca Juniors',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Boca_Juniors_logo18.svg/120px-Boca_Juniors_logo18.svg.png',cat:'Club'},
+  {id:403,name:'Racing Club',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Escudo_de_Racing_Club_%282014%29.svg/120px-Escudo_de_Racing_Club_%282014%29.svg.png',cat:'Club'},
+  {id:404,name:'Independiente',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg/120px-Escudo_del_Club_Atl%C3%A9tico_Independiente.svg.png',cat:'Club'},
+  {id:405,name:'San Lorenzo',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Sanlorenzo_almagro_logo2026.png/120px-Sanlorenzo_almagro_logo2026.png',cat:'Club'},
+  {id:406,name:'Flamengo',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Clube_de_Regatas_do_Flamengo_logo.svg/120px-Clube_de_Regatas_do_Flamengo_logo.svg.png',cat:'Club'},
+  {id:407,name:'Palmeiras',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Palmeiras_logo.svg/120px-Palmeiras_logo.svg.png',cat:'Club'},
+  {id:408,name:'Fluminense',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Fluminense_Football_Club.svg/120px-Fluminense_Football_Club.svg.png',cat:'Club'},
+  {id:409,name:'Corinthians',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Sport_Club_Corinthians_Paulista.svg/120px-Sport_Club_Corinthians_Paulista.svg.png',cat:'Club'},
+  {id:410,name:'Atlético Mineiro',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Logo_of_Clube_Atl%C3%A9tico_Mineiro.svg/120px-Logo_of_Clube_Atl%C3%A9tico_Mineiro.svg.png',cat:'Club'},
+  {id:411,name:'Grêmio',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Gremio_logo.svg/120px-Gremio_logo.svg.png',cat:'Club'},
+  {id:412,name:'Santos',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Santos_Futebol_Clube_logo_%28with_stars_and_crown%29.png/120px-Santos_Futebol_Clube_logo_%28with_stars_and_crown%29.png',cat:'Club'},
+  {id:413,name:'Botafogo',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Botafogo_de_Futebol_e_Regatas_logo.svg/120px-Botafogo_de_Futebol_e_Regatas_logo.svg.png',cat:'Club'},
+  {id:414,name:'Peñarol',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Escudo_del_Club_Atl%C3%A9tico_Pe%C3%B1arol.svg/120px-Escudo_del_Club_Atl%C3%A9tico_Pe%C3%B1arol.svg.png',cat:'Club'},
+  {id:415,name:'Nacional',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Escudo_del_Club_Nacional_de_Football.svg/120px-Escudo_del_Club_Nacional_de_Football.svg.png',cat:'Club'},
+  {id:416,name:'Colo Colo',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_Colo-Colo.svg/120px-Logo_Colo-Colo.svg.png',cat:'Club'},
+  {id:417,name:'Univ. de Chile',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Logo_Universidad_de_Chile.svg/120px-Logo_Universidad_de_Chile.svg.png',cat:'Club'},
+  {id:418,name:'Univ. Católica',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Club_Deportivo_Universidad_Cat%C3%B3lica.svg/120px-Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',cat:'Club'},
+  {id:419,name:'Atl. Nacional',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Atletico_Nacional_Logo.svg/120px-Atletico_Nacional_Logo.svg.png',cat:'Club'},
+  {id:420,name:'Millonarios',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Millonarios_F%C3%BAtbol_Club_logo.svg/120px-Millonarios_F%C3%BAtbol_Club_logo.svg.png',cat:'Club'},
+  {id:421,name:'LDU Quito',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Liga_de_Quito_deportiva.png/120px-Liga_de_Quito_deportiva.png',cat:'Club'},
+  {id:422,name:'Ind. del Valle',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Escudoindependientedelvalle2023.png/120px-Escudoindependientedelvalle2023.png',cat:'Club'},
+  {id:423,name:'Olimpia',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_del_Club_Olimpia.svg/120px-Escudo_del_Club_Olimpia.svg.png',cat:'Club'},
+  {id:424,name:'Cerro Porteño',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg/120px-Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg.png',cat:'Club'},
+  {id:425,name:'Bolívar',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Emblem_bolivar.png/120px-Emblem_bolivar.png',cat:'Club'},
+  {id:426,name:'The Strongest',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Club_the_strongest_escudo_transparent_background_png_700px.png/120px-Club_the_strongest_escudo_transparent_background_png_700px.png',cat:'Club'},
+  {id:427,name:'Universitario',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Universitario_de_Deportes.png/120px-Universitario_de_Deportes.png',cat:'Club'},
+  {id:428,name:'Alianza Lima',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Escudo_Alianza_Lima.svg/120px-Escudo_Alianza_Lima.svg.png',cat:'Club'},
+  // CHAMPIONS LEAGUE - football-data.org (escudos oficiales garantizados)
+  {id:501,name:'Real Madrid',logo:'https://crests.football-data.org/86.png',cat:'EuroClub'},
+  {id:502,name:'Barcelona',logo:'https://crests.football-data.org/81.png',cat:'EuroClub'},
+  {id:503,name:'Atlético Madrid',logo:'https://crests.football-data.org/78.png',cat:'EuroClub'},
+  {id:504,name:'Manchester City',logo:'https://crests.football-data.org/65.png',cat:'EuroClub'},
+  {id:505,name:'Liverpool',logo:'https://crests.football-data.org/64.png',cat:'EuroClub'},
+  {id:506,name:'Chelsea',logo:'https://crests.football-data.org/61.png',cat:'EuroClub'},
+  {id:507,name:'Arsenal',logo:'https://crests.football-data.org/57.png',cat:'EuroClub'},
+  {id:508,name:'Man. United',logo:'https://crests.football-data.org/66.png',cat:'EuroClub'},
+  {id:509,name:'Bayern Munich',logo:'https://crests.football-data.org/5.png',cat:'EuroClub'},
+  {id:510,name:'B. Dortmund',logo:'https://crests.football-data.org/4.png',cat:'EuroClub'},
+  {id:511,name:'RB Leipzig',logo:'https://crests.football-data.org/721.png',cat:'EuroClub'},
+  {id:512,name:'PSG',logo:'https://crests.football-data.org/524.png',cat:'EuroClub'},
+  {id:513,name:'Inter Milan',logo:'https://crests.football-data.org/108.png',cat:'EuroClub'},
+  {id:514,name:'AC Milan',logo:'https://crests.football-data.org/98.png',cat:'EuroClub'},
+  {id:515,name:'Juventus',logo:'https://crests.football-data.org/109.png',cat:'EuroClub'},
+  {id:516,name:'Napoli',logo:'https://crests.football-data.org/113.png',cat:'EuroClub'},
+  {id:517,name:'Porto',logo:'https://crests.football-data.org/503.png',cat:'EuroClub'},
+  {id:518,name:'Benfica',logo:'https://crests.football-data.org/1903.png',cat:'EuroClub'},
+  {id:519,name:'Ajax',logo:'https://crests.football-data.org/674.png',cat:'EuroClub'},
+  {id:520,name:'PSV',logo:'https://crests.football-data.org/672.png',cat:'EuroClub'},
+];
+
+const CLR=['#e53935','#1e88e5','#43a047','#fb8c00','#8e24aa','#00897b','#f4511e','#3949ab'];
+function TeamLogo({logo,name,sz=28}){
+  const[ok,setOk]=useState(true);
+  const bg=CLR[name.charCodeAt(0)%CLR.length];
+  if(!ok||!logo)return <span style={{width:sz,height:sz,borderRadius:4,background:bg,display:'inline-flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:sz*.45,flexShrink:0}}>{name.charAt(0).toUpperCase()}</span>;
+  return <img src={logo} onError={()=>setOk(false)} style={{width:sz,height:sz,objectFit:'contain',borderRadius:4,flexShrink:0}}/>;
+}
+
+function App(){
+  const[view,setView]=useState('HOME');
+  const[db,setDb]=useState(()=>{const s=localStorage.getItem('CM_DB10');return s?JSON.parse(s):SEED});
+  const[cup,setCup]=useState(null);
+  const[sel,setSel]=useState([]);
+  const[br,setBr]=useState(null);
+  const[admin,setAdmin]=useState(false);
+  const[imp,setImp]=useState('');
+
+  useEffect(()=>{localStorage.setItem('CM_DB10',JSON.stringify(db))},[db]);
+
+  useEffect(()=>{setTimeout(()=>{if(window.lucide)window.lucide.createIcons()},100)});
+
+  const gen=()=>{const s=[...sel].sort(()=>Math.random()-.5);const is8=cup.size===8;
+    setBr({name:cup.name,img:cup.img,r16:is8?[]:s,qf:is8?s:Array(8).fill(null),sf:Array(4).fill(null),f:Array(2).fill(null),w:null});setView('BK')};
+
+  const adv=(t,r,i)=>{if(!t)return;const n={...br};
+    if(r==='r16')n.qf[i]=t;else if(r==='qf')n.sf[i]=t;else if(r==='sf')n.f[i]=t;else if(r==='f')n.w=t;setBr(n)};
+
+  const doImport=()=>{const nw=imp.split('\n').map(l=>{const p=l.split(',');if(p[0]&&p[1])return{id:Date.now()+Math.random(),name:p[0].trim(),logo:p[1].trim(),cat:(p[2]||'Nacional').trim()};return null}).filter(Boolean);setDb([...db,...nw]);setImp('')};
+
+  const M=({t1,t2,onW,wId})=>(
+    <div className="mc">
+      <div className={`tr ${wId===t1?.id&&t1?'w':''}`} onClick={()=>onW(t1)}>
+        <img src={t1?.logo} className="fl" onError={e=>{e.target.style.display='none'}}/>
+        <span className="tn">{t1?.name||'—'}</span>
+      </div>
+      <div className={`tr ${wId===t2?.id&&t2?'w':''}`} onClick={()=>onW(t2)}>
+        <img src={t2?.logo} className="fl" onError={e=>{e.target.style.display='none'}}/>
+        <span className="tn">{t2?.name||'—'}</span>
+      </div>
+    </div>
+  );
+
+  return(<>
+    <nav className="nav">
+      <div className="logo" onClick={()=>setView('HOME')}><i data-lucide="trophy"></i> CHAMPIONSHIP MASTER</div>
+      <div style={{display:'flex',gap:8}}>
+        <button className="btn btn-o" onClick={()=>setAdmin(true)}><i data-lucide="settings" style={{width:16,height:16}}></i> Mantenedor</button>
+        <button className="btn btn-p" onClick={()=>setView('HOME')}><i data-lucide="home" style={{width:16,height:16}}></i> Inicio</button>
+      </div>
+    </nav>
+    <div className="wrap">
+      {view==='HOME'&&<div className="anim">
+        <h1 style={{textAlign:'center',fontSize:'2.5rem',marginBottom:10}}>SIMULA TU CAMPEONATO</h1>
+        <p style={{textAlign:'center',color:'#888',marginBottom:10}}>Elige un torneo y arma tus llaves</p>
+        <div className="tg">{CUPS.map(c=>(
+          <div key={c.id} className="tc" onClick={()=>{setCup(c);setSel([]);setView('SEL')}}>
+            <div className="ti"><img src={c.img} alt={c.name}/></div>
+            <h3>{c.name}</h3>
+            <p>{c.size} Equipos • {c.type}</p>
+            <button className="btn btn-p" style={{width:'100%'}}>Iniciar</button>
+          </div>
+        ))}</div>
+      </div>}
+
+      {view==='SEL'&&<div className="anim sp">
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:25}}>
+          <button className="btn btn-o" onClick={()=>setView('HOME')}>← Atrás</button>
+          <h2 style={{fontSize:'1.6rem'}}>{cup.name}</h2>
+          <button className="btn btn-p" disabled={sel.length<cup.size} onClick={gen}>Generar Llaves ⚡</button>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+          <h3>Seleccionados: <span style={{color:'#1a237e'}}>{sel.length} / {cup.size}</span></h3>
+          <button className="btn btn-o" onClick={()=>setSel(db.filter(x=>x.cat===cup.type).slice(0,cup.size))}>Autocompletar</button>
+        </div>
+        <div className="sg">{db.filter(t=>t.cat===cup.type).map(t=>(
+          <div key={t.id} className={`si ${sel.find(x=>x.id===t.id)?'on':''}`} onClick={()=>{
+            if(sel.find(x=>x.id===t.id))setSel(sel.filter(x=>x.id!==t.id));
+            else if(sel.length<cup.size)setSel([...sel,t])}}>
+            <TeamLogo logo={t.logo} name={t.name}/>
+            <span style={{fontWeight:600,fontSize:'.85rem'}}>{t.name}</span>
+          </div>
+        ))}</div>
+      </div>}
+
+      {view==='BK'&&<div className="anim bk-bg" style={{backgroundImage:`url(${cup.bg})`}}>
+        <div className="bk-bg-overlay">
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:15}}>
+          <button className="btn btn-o" onClick={()=>setView('SEL')}>← Editar</button>
+          <h2 style={{fontSize:'2rem',fontWeight:900,textTransform:'uppercase',color:cup.color,textShadow:'0 2px 4px rgba(255,255,255,0.8)'}}>{br.name}</h2>
+          <button className="btn btn-p" onClick={()=>setView('HOME')}>+ Nuevo</button>
+        </div>
+        <div className="bk-wrap">
+          <div className="bk-side">
+            {cup.size===16&&<div className="rd"><div className="rd-lb">Octavos</div>
+              {[0,1,2,3].map(i=><M key={i} t1={br.r16[i*2]} t2={br.r16[i*2+1]} onW={t=>adv(t,'r16',i)} wId={br.qf[i]?.id}/>)}</div>}
+            <div className="rd"><div className="rd-lb">Cuartos</div>
+              {[0,1].map(i=><M key={i} t1={br.qf[i*2]} t2={br.qf[i*2+1]} onW={t=>adv(t,'qf',i)} wId={br.sf[i]?.id}/>)}</div>
+            <div className="rd"><div className="rd-lb">Semis</div>
+              <M t1={br.sf[0]} t2={br.sf[1]} onW={t=>adv(t,'sf',0)} wId={br.f[0]?.id}/></div>
+          </div>
+
+          <div className="pod">
+            <div className="pod-trophy"><img src={br.img} alt="Copa"/></div>
+            <div className="fin"><div className="rd-lb">La Gran Final</div>
+              <M t1={br.f[0]} t2={br.f[1]} onW={t=>adv(t,'f',0)} wId={br.w?.id}/></div>
+            {br.w&&<div className="champ anim">🏆 {br.w.name} 🏆</div>}
+          </div>
+
+          <div className="bk-side rev">
+            {cup.size===16&&<div className="rd"><div className="rd-lb">Octavos</div>
+              {[4,5,6,7].map(i=><M key={i} t1={br.r16[i*2]} t2={br.r16[i*2+1]} onW={t=>adv(t,'r16',i)} wId={br.qf[i]?.id}/>)}</div>}
+            <div className="rd"><div className="rd-lb">Cuartos</div>
+              {[2,3].map(i=><M key={i} t1={br.qf[i*2]} t2={br.qf[i*2+1]} onW={t=>adv(t,'qf',i)} wId={br.sf[i]?.id}/>)}</div>
+            <div className="rd"><div className="rd-lb">Semis</div>
+              <M t1={br.sf[2]} t2={br.sf[3]} onW={t=>adv(t,'sf',1)} wId={br.f[1]?.id}/></div>
+          </div>
+        </div>{/* bk-wrap */}
+        </div>{/* bk-bg-overlay */}
+      </div>}{/* bk-bg / BK view */}
+    </div>{/* wrap */}
+
+    {admin&&<div className="mo" onClick={()=>setAdmin(false)}>
+      <div className="moc anim" onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
+          <h2 style={{fontSize:'1.8rem',fontWeight:800}}>MANTENEDOR DE EQUIPOS</h2>
+          <button className="btn btn-o" onClick={()=>setAdmin(false)}>✕ Cerrar</button>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:25}}>
+          <div>
+            <h3 style={{marginBottom:8,fontSize:'.9rem'}}>Importación Masiva (Nombre, URL Logo, Categoría)</h3>
+            <textarea style={{height:120}} value={imp} onChange={e=>setImp(e.target.value)} placeholder={"Argentina, https://flagcdn.com/w80/ar.png, Nacional\nColo Colo, https://url-escudo.png, Club"}/>
+            <button className="btn btn-p" style={{width:'100%',marginTop:10}} onClick={doImport}>Cargar Equipos</button>
+            <div style={{marginTop:20,padding:15,background:'#f0f4ff',borderRadius:10,fontSize:'.8rem',color:'#555'}}>
+              <strong>Formato:</strong> Cada línea = un equipo.<br/>
+              Columnas separadas por coma: <code>Nombre, URL Imagen, Nacional o Club</code>
+            </div>
+          </div>
+          <div style={{maxHeight:400,overflowY:'auto'}}>
+            <table className="mtbl"><thead><tr><th>Logo</th><th>Nombre</th><th>Cat.</th><th></th></tr></thead>
+            <tbody>{db.map(t=>(
+              <tr key={t.id}>
+                <td><img src={t.logo} className="fl"/></td>
+                <td><input value={t.name} onChange={e=>{const n=[...db];n.find(x=>x.id===t.id).name=e.target.value;setDb(n)}}/></td>
+                <td><select value={t.cat} onChange={e=>{const n=[...db];n.find(x=>x.id===t.id).cat=e.target.value;setDb(n)}}><option>Nacional</option><option>Club</option></select></td>
+                <td><button className="btn btn-r" style={{padding:'4px 8px',fontSize:'.65rem'}} onClick={()=>setDb(db.filter(x=>x.id!==t.id))}>✕</button></td>
+              </tr>
+            ))}</tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>}
+  </>);
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
