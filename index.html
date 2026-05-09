@@ -263,8 +263,8 @@ function App(){
     const data={v:1,cup,br,sel,ts:new Date().toISOString()};
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=`${cup.name.replace(/\s+/g,'_')}_${new Date().toLocaleDateString('es-CL').replace(/\//g'-')}.json`;
-    a.click();
+    a.download=(cup.name.replace(/\s+/g,'_'))+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
   };
 
   const saveBracket=()=>{
